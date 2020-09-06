@@ -1,0 +1,4 @@
+requests
+sseclient
+pandas
+configargparse
