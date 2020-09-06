@@ -15,6 +15,24 @@ This allows you to find not just winning and losing streaks, but also
 winning and losing streaks _against a set of opponents_.
 
 
+## Table of Contents
+
+* [Screenshots](#screenshots)
+* [Installation](#installation)
+    * [pip](#pip)
+    * [source](#source)
+* [Quick Start](#quick-start)
+    * [Command line flags](#command-line-flags)
+    * [Configuration file](#configuration-file)
+* [Data](#data)
+* [Configuration Examples](#configuration-examples)
+* [Scripts](#scripts)
+* [Software architecture](#software-architecture)
+* [Who is this tool for?](#who-is-this-tool-for)
+* [Future work](#future-work)
+    * [Libraries used](#libraries-used)
+
+
 ## Screenshots
 
 The `streak-finder` tool can print plain text tables to the console,
