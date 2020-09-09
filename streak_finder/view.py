@@ -39,7 +39,7 @@ class View(object):
             descr = "Losing "
         descr += "streaks "
 
-        # Sanitize unicode for html display and comparison
+        # Sanitize unicode for and comparison
         our_teams = [sanitize_dale(t) for t in self.our_teams]
         their_teams = [sanitize_dale(t) for t in self.their_teams]
 
@@ -153,6 +153,9 @@ class HtmlView(View):
             wl = "Winning" if self.winning else "Losing"
             our_team = row['Team Name']
             our_df = our_data[our_team]
+
+            # We need to sanitize Dale again, this time for HTML instead of command line
+            streak_df['Team Name'] = streak_df['Team Name'].apply(sanitize_dale)
 
             table = []
             table.append("<br />")
