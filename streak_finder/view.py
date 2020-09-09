@@ -24,9 +24,17 @@ class View(object):
             self.output_file = None
         else:
             self.output_file = options.output
-            output_file_path = os.path.dirname(self.output_file)
-            if not os.path.exists(output_file_path):
-                raise Exception("Error: directory for output file (%s) does not exist!"%(output_file_path))
+            if os.path.exists(self.output_file):
+                print("WARNING: Overwriting an existing file %s"%(self.output_file))
+                print("Waiting 5 seconds before proceeding")
+                time.sleep(5)
+                # Clear out the file
+                with open(self.output_file, 'w') as f:
+                    f.write("")
+            else:
+                output_file_path = os.path.dirname(self.output_file)
+                if not os.path.exists(output_file_path):
+                    raise Exception("Error: directory for output file (%s) does not exist!"%(output_file_path))
 
         self.streak_data = StreakData(options)
 
@@ -324,3 +332,161 @@ class TextView(View):
 
         # Note to user (foot matter)
         print("\nNote: all days and seasons displayed are 1-indexed.")
+
+
+
+class MarkdownView(View):
+    """
+    MarkdownView turns a dataframe into Markdown tables.
+    """
+    def short_table(self):
+        """
+        Print a short table that summarizes all of the streaks found.
+        One line/row per streak.
+        """
+        # Team nickname to full name map
+        short2long = get_short2long()
+
+        try:
+            streak_df, _ = self.streak_data.find_streaks()
+        except NoStreaksException:
+            print("\nNo streaks matching the specified criteria were found. Try a lower value for --min, or more versus teams.\n")
+            sys.exit(0)
+
+        # For new columns
+        nickfull = lambda x: x if self.use_nicknames else short2long[x]
+
+        # Nicknames or full names
+        streak_df['Team Name'] = streak_df['Team Name'].apply(nickfull)
+
+        description = self.make_table_descr()
+
+        # -----
+
+        # This string is the final table in Markdown format
+        table = ""
+
+        # Start header line
+        table_header = "| Team Name | Length | Season | Days |"
+        # Start separator line (controls alignment)
+        table_sep = "| ----- | ----- | ----- | ----- |"
+
+        table += table_header
+        table += "\n"
+        table += table_sep
+        table += "\n"
+        str_template = "| %-30s | %-10s | %-10s | %s |"
+        for i, row in streak_df.iterrows():
+            row = str_template%(
+                row['Team Name'],
+                row['Streak Length'],
+                int(row['Streak Season'])+1,
+                ", ".join([str(j+1) for j in row['Streak Days']])
+            )
+            table += row
+            table += "\n"
+
+        if self.output_file is None:
+            print("\n\n")
+            print(description)
+            print("\n\n")
+            print(table)
+            print("\n")
+            print("\nNote: all days and seasons displayed are 1-indexed.")
+        else:
+            with open(self.output_file, 'w') as f:
+                f.write("\n\n")
+                f.write(description)
+                f.write("\n\n")
+                f.write(table)
+                f.write("\n")
+                f.write("\nNote: all days and seasons displayed are 1-indexed.")
+
+
+    def long_table(self):
+        """
+        Print a set of tables that summarize all games in the streaks found.
+        One table per streak, one row per game that is part of the streak.
+        """
+        # Team nickname to full name map
+        short2long = get_short2long()
+
+        try:
+            streak_df, our_data = self.streak_data.find_streaks()
+        except NoStreaksException:
+            print("\nNo streaks matching the specified criteria were found. Try a lower value for --min, or more versus teams.\n")
+            sys.exit(0)
+
+        # Table description (head matter)
+        description = self.make_table_descr()
+
+        # -----
+
+        # This is the master document that compiles all other tables
+        md = ""
+
+        # One description for all tables
+        md += "\n\n"
+        md += description
+        md += "\n\n"
+
+        # Create one table per streak found
+        for i, (_, row) in enumerate(streak_df.iterrows()):
+            # This string is the final table
+            table = ""
+
+            wl = "Winning" if self.winning else "Losing"
+            short_name = row['Team Name']
+            long_name = short2long[short_name]
+            if self.use_nicknames:
+                this_name = short_name
+            else:
+                this_name = long_name
+
+            our_df = our_data[short_name]
+
+            table_header = "| %d Game %s Streak by the %s |"%(row['Streak Length'], wl, this_name)
+            table_sep = "| ----- |"
+            
+            row1 = "| Season %d Games %s |"%(row['Streak Season']+1, ", ".join([str(j) for j in row['Streak Days']]))
+
+            table += table_header
+            table += "\n"
+            table += table_sep
+            table += "\n"
+            table += row1
+            table += "\n"
+
+            scorestring = "| G%d: Season %d Game %d: %s %-2d @ %2d %s |"
+            for j, today in enumerate(row['Streak Days']):
+                this_season = int(row['Streak Season'])
+                temp = our_df.loc[(our_df['day']==today) & (our_df['season']==this_season)]
+                if self.use_nicknames:
+                    home_name_key = 'homeTeamNickname'
+                    away_name_key = 'awayTeamNickname'
+                else:
+                    home_name_key = 'homeTeamName'
+                    away_name_key = 'awayTeamName'
+                rowstr = scorestring%(
+                    j+1,
+                    temp['season']+1,
+                    temp['day']+1,
+                    temp[away_name_key].values[0],
+                    temp['awayScore'].values[0],
+                    temp['homeScore'].values[0],
+                    temp[home_name_key].values[0]
+                )
+                table += rowstr
+                table += "\n"
+
+            # Add the final table to the master document
+            md += table + "\n\n"
+
+        md += "\nNote: all days and seasons displayed are 1-indexed."
+
+        if self.output_file is None:
+            print(md)
+        else:
+            with open(self.output_file, 'w') as f:
+                f.write(md)
+

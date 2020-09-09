@@ -2,7 +2,7 @@ import sys
 import os
 import json
 import configargparse
-from .view import TextView, HtmlView
+from .view import TextView, HtmlView, MarkdownView
 from .util import (
     desanitize_dale,
     get_league_division_team_data,
@@ -17,6 +17,13 @@ def main(sysargs = sys.argv[1:]):
 
     # These are safe for command line usage (no accent in Dale)
     LEAGUES, DIVISIONS, ALLTEAMS = get_league_division_team_data()
+
+    p.add('-v',
+          '--version',
+          required=False,
+          default=False,
+          action='store_true',
+          help='Print program name and version number and exit')
 
     p.add('-c',
           '--config',
@@ -83,6 +90,10 @@ def main(sysargs = sys.argv[1:]):
           action='store_true',
           default=False,
           help='Print streak data in HTML format')
+    p.add('--markdown',
+          action='store_true',
+          default=False,
+          help='Print streak data in Markdown table format')
     p.add('--output',
           required=False,
           type=str,
@@ -111,8 +122,17 @@ def main(sysargs = sys.argv[1:]):
           default=False,
           help='Print full team names (e.g., Hellmouth Sunbeams)')
 
+    # -----
+
     # Parse arguments
     options = p.parse_args(sys.argv[1:])
+
+    # If the user asked for the version,
+    # print the version number and exit.
+    if options.version:
+        from . import _program, __version__
+        print(_program, __version__)
+        sys.exit(0)
 
     # If user did not specify winning/losing, use default (winning)
     if (not options.winning) and (not options.losing):
@@ -176,6 +196,9 @@ def main(sysargs = sys.argv[1:]):
 
     if options.html:
         v = HtmlView(options)
+        v.table()
+    elif options.markdown:
+        v = MarkdownView(options)
         v.table()
     else:
         v = TextView(options)
