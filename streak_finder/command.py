@@ -3,14 +3,12 @@ import os
 import json
 import configargparse
 from .view import TextView, HtmlView
-from .util import sanitize_dale, desanitize_dale
-
-
-root_path = os.path.abspath(os.path.join(os.path.dirname(__file__)))
-data_path = os.path.abspath(os.path.join(root_path, 'data'))
-
-GAMES_DATA_JSON = os.path.join(data_path, "games_data_trim.json")
-TEAMS_DATA_JSON = os.path.join(data_path, "teams_data.json")
+from .util import (
+    desanitize_dale,
+    get_league_division_team_data,
+    league_to_teams,
+    division_to_teams
+)
 
 
 def main(sysargs = sys.argv[1:]):
@@ -182,50 +180,6 @@ def main(sysargs = sys.argv[1:]):
     else:
         v = TextView(options)
         v.table()
-
-
-def get_league_division_team_data():
-    """
-    Get a list of leagues, divisions, and teams.
-    This is for use in creating CLI flag values,
-    so we replace Dal\u00e9 with Dale.
-    """
-    with open(TEAMS_DATA_JSON, 'r') as f:
-        td = json.load(f)
-    leagues = sorted(list(td['leagues'].keys()))
-    divisions = sorted(list(td['divisions'].keys()))
-    teams = []
-    for league in leagues:
-        teams += td['leagues'][league]
-    teams = sorted(list(teams))
-    teams = [sanitize_dale(s) for s in teams]
-    return (leagues, divisions, teams)
-
-
-def league_to_teams(league):
-    """
-    For a given league, return a list of all teams in that league.
-    We replace Dal\u00e9 with Dale (see above).
-    """
-    with open(TEAMS_DATA_JSON, 'r') as f:
-        td = json.load(f)
-    teams = []
-    teams += td['leagues'][league]
-    teams = [sanitize_dale(s) for s in teams]
-    return teams
-
-
-def division_to_teams(division):
-    """
-    For a given division, return a list of all teams in that league.
-    We replace Dal\u00e9 with Dale (see above).
-    """
-    with open(TEAMS_DATA_JSON, 'r') as f:
-        td = json.load(f)
-    teams = []
-    teams += td['divisions'][division]
-    teams = [sanitize_dale(s) for s in teams]
-    return teams
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 memo
 vp
 attic
-cli/data/update_data.json
+streak_finder/data/update_data.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

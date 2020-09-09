@@ -1,3 +1,8 @@
+# v.03
+
+* Rename source code directory from cli to streak_finder to avoid naming conflicts
+* Update table descriptions
+
 # v0.2
 
 * Initial release

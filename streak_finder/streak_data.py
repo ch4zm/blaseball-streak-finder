@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+from .util import GAMES_DATA_JSON
 
 
 """
@@ -8,12 +9,6 @@ in it. You can then ask it to give you streak information,
 and it will do the necessary calculations and return the
 necessary information.
 """
-
-
-root_path = os.path.abspath(os.path.join(os.path.dirname(__file__)))
-data_path = os.path.abspath(os.path.join(root_path, 'data'))
-
-GAMES_DATA_JSON = os.path.join(data_path, "games_data_trim.json")
 
 
 class NoStreaksException(Exception):

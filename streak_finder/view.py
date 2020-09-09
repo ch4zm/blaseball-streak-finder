@@ -1,6 +1,6 @@
 import os
 import sys
-from .util import sanitize_dale, get_short2long
+from .util import sanitize_dale, get_short2long, get_league_division_team_data
 from .streak_data import StreakData, NoStreaksException
 
 
@@ -16,6 +16,9 @@ class View(object):
         self.use_nicknames = options.nickname
         self.our_teams = options.team
         self.their_teams = options.versus_team
+        self.min = options.min
+        self.seasons = options.season
+        _, _, self.ALLTEAMS = get_league_division_team_data()
 
         if options.output == '':
             self.output_file = None
@@ -34,10 +37,31 @@ class View(object):
             descr = "Winning "
         else:
             descr = "Losing "
-        # Sanitize unicode for html display
+        descr += "streaks "
+
+        # Sanitize unicode for html display and comparison
         our_teams = [sanitize_dale(t) for t in self.our_teams]
         their_teams = [sanitize_dale(t) for t in self.their_teams]
-        descr += "streaks for %s versus %s"%(", ".join(our_teams), ", ".join(their_teams))
+
+        # State minimum number of games in this table
+        if self.min:
+            descr += "of %d or more games "%(self.min)
+
+        # If our_teams is all teams, just say all teams
+        if len(set(self.ALLTEAMS) - set(our_teams)) == 0:
+            our_teams = ["all teams"]
+        if len(set(self.ALLTEAMS) - set(their_teams)) == 0:
+            their_teams = ["all teams"]
+        descr += "for %s versus %s "%(", ".join(our_teams), ", ".join(their_teams))
+
+        # for season X
+        if 'all' in self.seasons:
+            descr += "for all time"
+        elif len(self.seasons)==1:
+            descr += "for season %s"%("".join([str(j) for j in self.seasons]))
+        else:
+            descr += "for seasons %s"%(", ".join([str(j) for j in self.seasons]))
+
         return descr
 
     def short_table(self):

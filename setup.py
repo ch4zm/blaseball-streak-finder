@@ -13,14 +13,14 @@ with open(path.join(this_directory, 'Readme.md'), encoding='utf-8') as f:
 
 # Note: the _program variable is set in __init__.py.
 # it determines the name of the command line tool.
-from cli import __version__, _program
+from streak_finder import __version__, _program
 
 setup(
     name='blaseball-streak-finder',
     version=__version__,
-    packages=['cli'],
+    packages=['streak_finder'],
     package_data = {
-      'cli': ['data/*.json']
+      'streak_finder': ['data/*.json']
     },
     description='streak-finder is a command line interface for finding blaseball win/loss streaks',
     url='https://github.com/ch4zm/blaseball-streak-finder',
@@ -29,7 +29,7 @@ setup(
     license='BSD-3-Clause',
     entry_points="""
     [console_scripts]
-    {program} = cli.command:main
+    {program} = streak_finder.command:main
     """.format(program = _program),
     install_requires=required,
     keywords=[],
