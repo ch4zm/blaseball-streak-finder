@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from .util import GAMES_DATA_JSON
+import blaseball_core_game_data as gd
 
 
 """
@@ -20,10 +20,7 @@ class StreakData(object):
     """
     def __init__(self, options):
         """Load the data set into self.df"""
-        if os.path.exists(GAMES_DATA_JSON):
-            self.df = pd.read_json(GAMES_DATA_JSON)
-        else:
-            raise FileNotFoundError("Missing game data file: %s"%(GAMES_DATA_JSON))
+        self.df = pd.read_json(json.loads(gd.get_games_data()))
 
         # Drop tie games
         self.df = self._filter_ties()

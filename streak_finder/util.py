@@ -5,8 +5,6 @@ import os
 root_path = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 data_path = os.path.abspath(os.path.join(root_path, 'data'))
 
-GAMES_DATA_JSON = os.path.join(data_path, "games_data_trim.json")
-TEAMS_DATA_JSON = os.path.join(data_path, "teams_data.json")
 SHORT2LONG_JSON = os.path.join(data_path, "short2long.json")
 
 DALE_SAFE = "Dale" # for command line
@@ -22,8 +20,7 @@ def get_league_division_team_data():
     This is for use in creating CLI flag values,
     so we replace Dal\u00e9 with Dale.
     """
-    with open(TEAMS_DATA_JSON, 'r') as f:
-        td = json.load(f)
+    td = json.loads(gd.get_teams_data()))
     leagues = sorted(list(td['leagues'].keys()))
     divisions = sorted(list(td['divisions'].keys()))
     teams = []
@@ -39,8 +36,7 @@ def league_to_teams(league):
     For a given league, return a list of all teams in that league.
     We replace Dal\u00e9 with Dale (see above).
     """
-    with open(TEAMS_DATA_JSON, 'r') as f:
-        td = json.load(f)
+    td = json.loads(gd.get_teams_data()))
     teams = []
     teams += td['leagues'][league]
     teams = [sanitize_dale(s) for s in teams]
@@ -52,8 +48,7 @@ def division_to_teams(division):
     For a given division, return a list of all teams in that league.
     We replace Dal\u00e9 with Dale (see above).
     """
-    with open(TEAMS_DATA_JSON, 'r') as f:
-        td = json.load(f)
+    td = json.loads(gd.get_teams_data()))
     teams = []
     teams += td['divisions'][division]
     teams = [sanitize_dale(s) for s in teams]
