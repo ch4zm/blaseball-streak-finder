@@ -20,7 +20,7 @@ class StreakData(object):
     """
     def __init__(self, options):
         """Load the data set into self.df"""
-        self.df = pd.read_json(json.loads(gd.get_games_data()))
+        self.df = pd.read_json(gd.get_games_data())
 
         # Drop tie games
         self.df = self._filter_ties()
