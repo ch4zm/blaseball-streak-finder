@@ -76,7 +76,6 @@ def main(sysargs = sys.argv[1:]):
     p.add('--season',
           required=False,
           action='append',
-          choices=['1', '2', '3', '4', '5'],
           help='Specify season (use flag multiple times for multiple seasons, no --seasons flag means all data)')
 
     # Minimum number of wins to be considered a streak
@@ -189,6 +188,11 @@ def main(sysargs = sys.argv[1:]):
     # If nothing was provided for seasons, set it to 'all'
     if not options.season:
         options.season = ['all']
+    else:
+        try:
+            _ = [str(j) for j in options.season]
+        except ValueError:
+            raise Exception("Error: you must provide integers to the --season flag: --season 1 --season 2")
 
     # No more user input required, so convert Dale back to utf8
     options.team = [desanitize_dale(s) for s in options.team]
