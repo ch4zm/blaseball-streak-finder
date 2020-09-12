@@ -28,3 +28,5 @@ for line in lines:
 
 with open(os.path.join(init_path, INIT), 'w') as f:
     f.write(content)
+
+print(new_version_str)
