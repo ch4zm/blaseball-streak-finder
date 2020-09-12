@@ -1,3 +1,12 @@
+# v1.0
+
+* Automated release process
+* Use blaseball-core-game-data
+
+# v0.5
+
+* Add markdown table format option
+
 # v0.4
 
 * Rename source code directory from cli to streak_finder to avoid naming conflicts

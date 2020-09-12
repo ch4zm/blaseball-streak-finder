@@ -36,7 +36,7 @@ winning and losing streaks _against a set of opponents_.
 ## Screenshots
 
 The `streak-finder` tool can print plain text tables to the console,
-or output tables in HTML format. Here are a few examples:
+or output tables in HTML or Markdown format. Here are a few examples:
 
 Look for winning streaks from the Tigers from Season 3 and 4,
 
@@ -149,11 +149,14 @@ View options:
 
 * **Minimum**: Specify the minimum number of wins or losses to qualify as a streak with `--min N`
 
-* **HTML**: Use `--html` to specify that the output should be in HTML format.
+* **HTML**: Use `--html` to specify that the output should be in HTML table format.
   If no `--output` file is specified, it will print the HTML to stdout.
 
-* **Output File**: Use `--output` to specify the output file when using the `--html` flag.
-  This flag has no effect when `--html` flag is not present.
+* **Markdown**: Use `--markdown` to specify that the output should be in Markdown table format.
+  If no `--output` file is specified, it will print the Markdown to stdout.
+
+* **Output File**: Use `--output` to specify the output file when using the `--html` or `--markdown` flags.
+  This flag has no effect when `--html` or `--markdown` are not present.
 
 * **Use Short Output**: Use `--short` to display streaks in short format
   (one line per streak; default option).
@@ -209,7 +212,7 @@ precedence over config file options if a parameter is specified by both.
 ## Data
 
 The data set used by this tool comes from `blaseball.com`'s `/games` API endpoint.
-The data set is stored in the json file `cli/data/games_data_trim.json`.
+The data set is imported from [`blaseball-core-game-data`](https://githib.com/ch4zm/blaseball-core-game-data).
 
 
 ## Configuration Examples
@@ -293,23 +296,18 @@ html
 output = long.html
 ```
 
-
-## Scripts
-
-This repo includes a script to download game data and reproduce the data set.
-The script is intelligent enough to keep track of what days have already been
-downloaded, so the first time through it will re-download all game data, but 
-from that point forward it will only download game data that has been added
-since the last time it was run.
-
-To run the script:
+Repeat the above streak-finding search, but output a Markdown table for each streak
+with a game-by-game breakdown (long format) to the file `long.md`:
 
 ```
-python scripts/fetch_game_data.py
+[data]
+team = Firefighters
+min = 7
+winning
+long
+markdown
+output = long.md
 ```
-
-See the [scripts Readme](scripts/Readme.md) for more info.
-
 
 ## Software architecture
 

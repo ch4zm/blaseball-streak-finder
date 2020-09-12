@@ -1,3 +1,4 @@
+blaseball-core-game-data
 requests
 sseclient
 pandas
