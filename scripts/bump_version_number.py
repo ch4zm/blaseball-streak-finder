@@ -9,7 +9,7 @@ For anything more major, do it yourself!
 """
 
 root_path = os.path.abspath(os.path.join(os.path.dirname(__file__)))
-init_path = os.path.abspath(os.path.join(root_path, '..', 'blaseball_core_game_data'))
+init_path = os.path.abspath(os.path.join(root_path, '..', 'streak_finder'))
 INIT = "__init__.py"
 
 with open(os.path.join(init_path, INIT), 'r') as f:
