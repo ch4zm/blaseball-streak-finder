@@ -26,7 +26,7 @@ setup(
     url='https://github.com/ch4zm/blaseball-streak-finder',
     author='Ch4zm of Hellmouth',
     author_email='ch4zm.of.hellmouth@gmail.com',
-    license='BSD-3-Clause',
+    license='MIT',
     entry_points="""
     [console_scripts]
     {program} = streak_finder.command:main
