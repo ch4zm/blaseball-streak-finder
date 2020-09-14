@@ -190,7 +190,7 @@ def main(sysargs = sys.argv[1:]):
         options.season = ['all']
     else:
         try:
-            _ = [str(j) for j in options.season]
+            _ = [int(j) for j in options.season]
         except ValueError:
             raise Exception("Error: you must provide integers to the --season flag: --season 1 --season 2")
 
