@@ -35,7 +35,6 @@ class StreakData(object):
         self.min = options.min
 
         # Get all data about games with our teams and versus teams
-        # (Creates dictionary with team name-team df as the k-v pairs)
         self.our_teams = options.team
         self.their_teams = options.versus_team
 

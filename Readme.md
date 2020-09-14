@@ -187,8 +187,7 @@ streak-finder --season 1 --season 2 --team Tigers --versus-team Pies --min 5 --f
 we could create a configuration file named `config.ini` with the contents:
 
 ```
-season = 1
-season = 2
+season = [1, 2]
 team = Tigers
 versus-team = Pies
 min = 5
@@ -250,7 +249,7 @@ winning
 min = 7
 ```
 
-Compare to top winning streaks from season 1 for all teams in the Good League:
+Compare to top winning streaks from season 1 for all teams in the Evil League:
 
 ```
 [data]
@@ -331,14 +330,13 @@ for developing their own blaseball tool.
 
 ## Future work
 
-* Move data set into a core blaseball game data library
-
-* Win/loss records tool
+* Add pitcher filter
 
 
 ## Libraries used
 
 This command line tool uses the following libraries under the hood:
 
+* [blaseball-core-game-data](https://github.com/ch4zm/blaseball-core-game-data)
 * [pandas](https://pandas.pydata.org/) for organizing/filtering data
 * [configarparse](https://github.com/bw2/ConfigArgParse) for handling CLI arguments
