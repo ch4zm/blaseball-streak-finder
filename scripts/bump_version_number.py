@@ -10,7 +10,7 @@ If your version number is 0.0.1, it will bump it to 0.0.2.
 """
 
 
-pkg_name = 'interesting_blaseball_games'
+pkg_name = 'streak_finder'
 
 
 def usage():

@@ -79,8 +79,8 @@ make pypi || { echo "Failed make pypi step"; exit 1; }
 echo "Done!"
 
 echo "Making git tag"
-git add interesting_blaseball_games
-git commit interesting_blaseball_games -m "auto-update to version $VERSION"
+git add streak_finder
+git commit streak_finder -m "auto-update to version $VERSION"
 git tag $VERSION
 git push --tags ch4zm master
 
