@@ -308,6 +308,36 @@ markdown
 output = long.md
 ```
 
+## Python API
+
+If you prefer to call this tool from Python directly, rather than from the
+command line, you can import and call the `streak_finder` function and pass
+it a list of strings containing the flags you would normally pass on the
+command line.
+
+```python
+from streak_finder.command import streak_finder
+
+flags = "--winning --team Millennials --versus-team Flowers --fullname"
+output = streak_finder(flags.split(" "))
+game_ids = [j.strip() for j in output.split("\n")]
+print(game_ids)
+```
+
+If you prefer to store the JSON game object returned by `game-finder` as
+a native Python dictionary, you can use `json.loads()`:
+
+```python
+from game_finder.command import game_finder
+import json
+
+flags = "--json --season 1 --season 2 --team Tigers --versus-team Pies"
+output = game_finder(flags.split(" "))
+json_data = json.loads(output)
+print(json_data)
+```
+
+
 ## Software architecture
 
 This software consists of three parts:

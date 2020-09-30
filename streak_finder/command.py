@@ -7,7 +7,8 @@ from .util import (
     desanitize_dale,
     get_league_division_team_data,
     league_to_teams,
-    division_to_teams
+    division_to_teams,
+    CaptureStdout
 )
 
 
@@ -212,6 +213,12 @@ def main(sysargs = sys.argv[1:]):
     else:
         v = TextView(options)
         v.table()
+
+
+def streak_summary(sysargs):
+    with CaptureStdout() as so:
+        main(sysargs)
+    return str(so)
 
 
 if __name__ == '__main__':
