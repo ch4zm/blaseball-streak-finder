@@ -54,7 +54,7 @@ cd $ROOTDIR
 rm -fr $ROOTDIR/.releasevp
 
 # make and enter virtualenv
-virtualenv -p python3.6 $ROOTDIR/.releasevp
+virtualenv -p python3.7 $ROOTDIR/.releasevp
 source $ROOTDIR/.releasevp/bin/activate
 
 VERSION=$($ROOTDIR/.releasevp/bin/python $ROOTDIR/scripts/bump_version_number.py $BUMP_ARGS)
