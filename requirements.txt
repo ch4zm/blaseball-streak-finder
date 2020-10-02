@@ -1,4 +1,4 @@
-blaseball-core-game-data
+blaseball-core-game-data>=0.8.4
 requests
 sseclient
 pandas
