@@ -21,14 +21,27 @@ def get_league_division_team_data():
     This is for use in creating CLI flag values,
     so we replace Dal\u00e9 with Dale.
     """
-    td = json.loads(gd.get_teams_data())
-    leagues = sorted(list(td['leagues'].keys()))
-    divisions = sorted(list(td['divisions'].keys()))
-    teams = []
-    for league in leagues:
-        teams += td['leagues'][league]
+    tds = json.loads(gd.get_teams_data())
+
+    leagues = set()
+    divisions = set()
+    teams = set()
+    for i in range(len(tds)):
+        td = tds[i]
+        leagues_ = sorted(list(td['leagues'].keys()))
+        divisions_ = sorted(list(td['divisions'].keys()))
+        leagues = leagues.union(leagues_)
+        divisions = divisions.union(leagues_)
+
+        teams_ = []
+        for league_ in leagues_:
+            teams_ += td['leagues'][league_]
+        teams = teams.union(teams_)
+
+    leagues = sorted(list(leagues))
     teams = sorted(list(teams))
-    teams = [sanitize_dale(s) for s in teams]
+    divisions = sorted(list(divisions))
+
     return (leagues, divisions, teams)
 
 
@@ -37,10 +50,23 @@ def league_to_teams(league):
     For a given league, return a list of all teams in that league.
     We replace Dal\u00e9 with Dale (see above).
     """
-    td = json.loads(gd.get_teams_data())
+    tds = json.loads(gd.get_teams_data())
     teams = []
-    teams += td['leagues'][league]
-    teams = [sanitize_dale(s) for s in teams]
+    if season is None:
+        for i in range(len(tds)):
+            td = tds[i]
+            leagues = sorted(list(td['leagues'].keys()))
+            if league in leagues:
+                teams = sorted(list(td['leagues'][league]))
+                break
+    else:
+        td = tds[season]
+        leagues = sorted(list(td['leagues'].keys()))
+        if league in leagues:
+            teams = sorted(list(td['leagues'][league]))
+
+    if len(teams)==0:
+        raise Exception("Error: Could not find any teams in league %s"%(league))
     return teams
 
 
@@ -49,10 +75,23 @@ def division_to_teams(division):
     For a given division, return a list of all teams in that league.
     We replace Dal\u00e9 with Dale (see above).
     """
-    td = json.loads(gd.get_teams_data())
+    tds = json.loads(gd.get_teams_data())
     teams = []
-    teams += td['divisions'][division]
-    teams = [sanitize_dale(s) for s in teams]
+    if season is None:
+        for i in range(len(tds)):
+            td = tds[i]
+            divisions = sorted(list(td['divisions'].keys()))
+            if division in divisions:
+                teams = sorted(list(td['divisions'][division]))
+                break
+    else:
+        td = tds[season]
+        divisions = sorted(list(td['divisions'].keys()))
+        if division in divisions:
+            teams = sorted(list(td['divisions'][division]))
+
+    if len(teams)==0:
+        raise Exception("Error: Could not find any teams in division %s"%(division))
     return teams
 
 
@@ -66,16 +105,6 @@ def get_short2long():
         raise FileNotFoundError("Missing team nickname to full name data file: %s"%(SHORT2LONG_JSON))
     return short2long
 
-
-
-def desanitize_dale(s):
-    """Utility function to change sanitized Dale back to unicode"""
-    if s == DALE_SAFE:
-        return DALE_UTF8
-    elif s == FULL_DALE_SAFE:
-        return FULL_DALE_UTF8
-    else:
-        return s
 
 
 def sanitize_dale(s):

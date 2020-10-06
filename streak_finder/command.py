@@ -2,9 +2,8 @@ import sys
 import os
 import json
 import configargparse
-from .view import TextView, HtmlView, MarkdownView
+from .view import TextView, MarkdownView
 from .util import (
-    desanitize_dale,
     get_league_division_team_data,
     league_to_teams,
     division_to_teams,
@@ -86,10 +85,10 @@ def main(sysargs = sys.argv[1:]):
           default=3,
           help='Minimum number of wins to be considered a streak (defaults to 3, make this higher if looking at multiple teams)')
 
-    p.add('--html',
+    p.add('--text',
           action='store_true',
-          default=False,
-          help='Print streak data in HTML format')
+          default=True,
+          help='Print streak data in plain text format')
     p.add('--markdown',
           action='store_true',
           default=False,
@@ -98,7 +97,7 @@ def main(sysargs = sys.argv[1:]):
           required=False,
           type=str,
           default='',
-          help='Specify the name of the HTML output file, for use with --html flag')
+          help='Specify the name of the Markdown output file, for use with --markdown flag')
 
     # Pick format for streak data
     m = p.add_mutually_exclusive_group()
@@ -200,14 +199,7 @@ def main(sysargs = sys.argv[1:]):
         except ValueError:
             raise Exception("Error: you must provide integers to the --season flag: --season 1 --season 2")
 
-    # No more user input required, so convert Dale back to utf8
-    options.team = [desanitize_dale(s) for s in options.team]
-    options.versus_team = [desanitize_dale(s) for s in options.versus_team]
-
-    if options.html:
-        v = HtmlView(options)
-        v.table()
-    elif options.markdown:
+    if options.markdown:
         v = MarkdownView(options)
         v.table()
     else:

@@ -12,29 +12,12 @@ class View(object):
     def __init__(self, options):
         self.short = options.short
         self.winning = options.winning
-        self.html = options.html
         self.use_nicknames = options.nickname
         self.our_teams = options.team
         self.their_teams = options.versus_team
         self.min = options.min
         self.seasons = options.season
         _, _, self.ALLTEAMS = get_league_division_team_data()
-
-        if options.output == '':
-            self.output_file = None
-        else:
-            self.output_file = options.output
-            if os.path.exists(self.output_file):
-                print("WARNING: Overwriting an existing file %s"%(self.output_file))
-                print("Waiting 5 seconds before proceeding")
-                time.sleep(5)
-                # Clear out the file
-                with open(self.output_file, 'w') as f:
-                    f.write("")
-            else:
-                output_file_path = os.path.dirname(self.output_file)
-                if not os.path.exists(output_file_path):
-                    raise Exception("Error: directory for output file (%s) does not exist!"%(output_file_path))
 
         self.streak_data = StreakData(options)
 
@@ -85,141 +68,6 @@ class View(object):
             self.short_table()
         else:
             self.long_table()
-
-
-class HtmlView(View):
-    """
-    HtmlView is intended to turn a dataframe
-    into HTML tables.
-    """
-    def short_table(self):
-        """Create short HTML table summarizing streaks found"""
-        # Team nickname to full name map
-        short2long = get_short2long()
-
-        try:
-            streak_df, _ = self.streak_data.find_streaks()
-        except NoStreaksException:
-            print("\nNo streaks matching the specified criteria were found. Try a lower value for --min, or more versus teams.\n")
-            sys.exit(0)
-
-        # For new columns
-        games_fn = lambda x: ", ".join([str(j+1) for j in x])
-        nickfull = lambda x: x if self.use_nicknames else short2long[x]
-
-        # Fix season numbers
-        streak_df['Streak Season'] = streak_df['Streak Season'].apply(lambda x: x+1)
-        # Deal with output file
-        streak_df['Streak Days'] = streak_df['Streak Days'].apply(games_fn)
-        # Nicknames or full names
-        streak_df['Team Name'] = streak_df['Team Name'].apply(nickfull)
-
-        # We need to sanitize Dale again, this time for HTML instead of command line
-        streak_df['Team Name'] = streak_df['Team Name'].apply(sanitize_dale)
-
-        result = streak_df.to_html(justify='center', index=False)
-        table_descr = self.make_table_descr()
-        if self.output_file is None:
-            print("<p>"+table_descr+"</p>\n")
-            print("<br />")
-            print(result)
-            print("<br />")
-            print("<p>Note: all days and seasons displayed are 1-indexed.</p>")
-        else:
-            with open(self.output_file, 'w') as f:
-                f.write("<p>"+table_descr+"</p>\n")
-                f.write("<br />\n")
-                f.write(result)
-                f.write("\n<p>Note: all days and seasons displayed are 1-indexed.</p>\n")
-            print("Wrote table HTML to file: %s"%(self.output_file))
-
-    def long_table(self):
-        """Create set of HTML tables with details about each streak found"""
-        short2long = get_short2long()
-
-        try:
-            streak_df, our_data = self.streak_data.find_streaks()
-        except NoStreaksException:
-            print("\nNo streaks matching the specified criteria were found. Try a lower value for --min, or more versus teams.\n")
-            sys.exit(0)
-
-        table_descr = self.make_table_descr()
-
-        # Table description (head matter)
-        if self.output_file is None:
-            print("<p>" + table_descr +"</p>")
-            print("<br />")
-        else:
-            with open(self.output_file, 'w') as f:
-                f.write("<p>" + table_descr +"</p>\n")
-                f.write("<br />\n")
-
-        # Create one table per streak found
-        line = "-"*60
-        scorestring = "G%d: Season %d Game %d: %s %-2d @ %2d %s"
-        for i, (_, row) in enumerate(streak_df.iterrows()):
-            wl = "Winning" if self.winning else "Losing"
-            our_team = row['Team Name']
-            our_df = our_data[our_team]
-
-            # We need to sanitize Dale again, this time for HTML instead of command line
-            streak_df['Team Name'] = streak_df['Team Name'].apply(sanitize_dale)
-
-            table = []
-            table.append("<br />")
-
-            # Header at the top of the table summarizing the streak/team/date
-            table.append("<table border=\"1\">")
-            table.append("<tr><td>")
-            table.append("%d Game %s Streak"%(row['Streak Length'], wl))
-            table.append("<br />")
-            if self.use_nicknames:
-                tname = row['Team Name']
-            else:
-                tname = short2long[row['Team Name']]
-            table.append("%s"%(tname))
-            table.append("<br />")
-            table.append("Season %d Games %s"%(row['Streak Season']+1, ", ".join([str(j) for j in row['Streak Days']])))
-            table.append("</tr></td>")
-
-            # Row for each game in the streak
-            for j, today in enumerate(row['Streak Days']):
-                this_season = int(row['Streak Season'])
-                temp = our_df.loc[(our_df['day']==today) & (our_df['season']==this_season)]
-                if self.use_nicknames:
-                    home_name_key = 'homeTeamNickname'
-                    away_name_key = 'awayTeamNickname'
-                else:
-                    home_name_key = 'homeTeamName'
-                    away_name_key = 'awayTeamName'
-
-                table.append("<tr><td>")
-                table.append(scorestring%(
-                    j+1,
-                    temp['season']+1,
-                    temp['day']+1,
-                    temp[away_name_key].values[0],
-                    temp['awayScore'].values[0],
-                    temp['homeScore'].values[0],
-                    temp[home_name_key].values[0]
-                ))
-                table.append("</tr></td>")
-            table.append("</table>")
-            table.append("<br />")
-
-            if self.output_file is None:
-                print("\n".join(table))
-            else:
-                with open(self.output_file, 'a') as f:
-                    f.write("\n".join(table))
-
-        # Note to user (foot matter)
-        if self.output_file is None:
-            print("<p>Note: all days and seasons displayed are 1-indexed.</p>")
-        else:
-            with open(self.output_file, 'a') as f:
-                f.write("\n<p>Note: all days and seasons displayed are 1-indexed.</p>\n")
-            print("Wrote table HTML to file: %s"%(self.output_file))
 
 
 class TextView(View):
@@ -339,6 +187,25 @@ class MarkdownView(View):
     """
     MarkdownView turns a dataframe into Markdown tables.
     """
+    def __init__(self, options):
+        super(options)
+
+        if options.output == '':
+            self.output_file = None
+        else:
+            self.output_file = options.output
+            if os.path.exists(self.output_file):
+                print("WARNING: Overwriting an existing file %s"%(self.output_file))
+                print("Waiting 5 seconds before proceeding")
+                time.sleep(5)
+                # Clear out the file
+                with open(self.output_file, 'w') as f:
+                    f.write("")
+            else:
+                output_file_path = os.path.dirname(self.output_file)
+                if not os.path.exists(output_file_path):
+                    raise Exception("Error: directory for output file (%s) does not exist!"%(output_file_path))
+
     def short_table(self):
         """
         Print a short table that summarizes all of the streaks found.
