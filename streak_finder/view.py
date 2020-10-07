@@ -188,7 +188,7 @@ class MarkdownView(View):
     MarkdownView turns a dataframe into Markdown tables.
     """
     def __init__(self, options):
-        super.__init__(options)
+        super().__init__(options)
 
         if options.output == '':
             self.output_file = None
