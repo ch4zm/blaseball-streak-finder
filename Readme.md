@@ -78,7 +78,7 @@ in both short and long versions:
 ### pip
 
 ```
-pip install blaseball-streak-finder
+pip install git+https://github.com/ch4zm/blaseball-streak-finder.git#egg=streak_finder
 ```
 
 ### source
