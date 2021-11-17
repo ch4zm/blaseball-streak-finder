@@ -78,7 +78,8 @@ in both short and long versions:
 ### pip
 
 ```
-pip install git+https://github.com/ch4zm/blaseball-streak-finder.git#egg=streak_finder
+pip install git+https://github.com/ch4zm/blaseball-core-game-data.git#egg=blaseball_core_game_data
+pip install git+https://github.com/ch4zm/blaseball-streak-finder.git#egg=blaseball_streak_finder
 ```
 
 ### source
